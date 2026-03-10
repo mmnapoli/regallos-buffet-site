@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Buffet Regallos',
-  description: 'O melhor buffet da região',
+  title: 'Regallos Gastronomia | Buffet Premium',
+  description: 'Monte seu cardápio personalizado para eventos. Buffet premium com opções de feijoada, churrasco, finger food e muito mais.',
 }
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-white text-gray-900">
+      <body className="bg-white text-text-main font-body">
         {children}
       </body>
     </html>

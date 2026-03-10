@@ -1,41 +1,191 @@
+'use client'
+
+import { useState, useMemo } from 'react'
+import Header from '@/components/Header'
+import StepIndicator from '@/components/StepIndicator'
+import CardapioCard from '@/components/CardapioCard'
+import GuestCounter from '@/components/GuestCounter'
+import ExtraCard from '@/components/ExtraCard'
+import BudgetSummary from '@/components/BudgetSummary'
+import StickyTotal from '@/components/StickyTotal'
+import { cardapios, extras as allExtras } from '@/data/mock'
+import type { Cardapio, Extra } from '@/types'
+import { ArrowRight, ArrowLeft, Sparkles } from 'lucide-react'
+
 export default function Home() {
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [selectedCardapio, setSelectedCardapio] = useState<Cardapio | null>(null)
+  const [guests, setGuests] = useState(50)
+  const [selectedExtras, setSelectedExtras] = useState<Extra[]>([])
+
+  // Extras filtrados pelo cardápio selecionado
+  const availableExtras = useMemo(() => {
+    if (!selectedCardapio) return []
+    return allExtras.filter((e) => e.linkedCardapios.includes(selectedCardapio.id))
+  }, [selectedCardapio])
+
+  // Agrupar extras por categoria
+  const groupedExtras = useMemo(() => {
+    const groups: Record<string, Extra[]> = {}
+    availableExtras.forEach((e) => {
+      if (!groups[e.category]) groups[e.category] = []
+      groups[e.category].push(e)
+    })
+    return groups
+  }, [availableExtras])
+
+  const categoryLabels: Record<string, string> = {
+    bebidas: 'Bebidas',
+    salgados: 'Salgados & Entradas',
+    sobremesas: 'Sobremesas',
+    servicos: 'Serviços',
+  }
+
+  const handleSelectCardapio = (cardapio: Cardapio) => {
+    setSelectedCardapio(cardapio)
+    setGuests(Math.max(guests, cardapio.minGuests))
+    // Limpar extras que não são compatíveis
+    setSelectedExtras((prev) =>
+      prev.filter((e) => e.linkedCardapios.includes(cardapio.id))
+    )
+  }
+
+  const toggleExtra = (extra: Extra) => {
+    setSelectedExtras((prev) => {
+      const exists = prev.find((e) => e.id === extra.id)
+      if (exists) return prev.filter((e) => e.id !== extra.id)
+      return [...prev, extra]
+    })
+  }
+
+  const canProceedStep1 = selectedCardapio !== null
+  const canProceedStep2 = true // Extras são opcionais
+
   return (
-    <main className="min-h-screen">
-      <header className="bg-red-700 text-white py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl font-bold">Buffet Regallos</h1>
-          <p className="text-lg mt-2">O melhor buffet da região</p>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white">
+      <Header />
 
-      <section className="max-w-4xl mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-4">Bem-vindo!</h2>
-        <p className="text-gray-600 mb-4">
-          Escolha uma das seções para conhecer melhor nossos serviços.
-        </p>
+      <main className="pt-24 pb-32 max-w-3xl mx-auto px-4">
+        {/* Hero */}
+        <section className="text-center mb-8">
+          <h2 className="font-heading text-3xl sm:text-4xl font-bold text-text-main">
+            Monte seu Cardápio
+          </h2>
+          <p className="text-text-muted mt-2 text-sm max-w-md mx-auto">
+            Personalize cada detalhe do seu evento com nossa calculadora de orçamento.
+          </p>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <div className="p-6 border rounded-lg hover:shadow-lg transition">
-            <h3 className="text-xl font-bold mb-2">🍽️ Cardápio</h3>
-            <p className="text-gray-600">Conheça nossa variedade de pratos deliciosos</p>
-          </div>
+        <StepIndicator currentStep={step} />
 
-          <div className="p-6 border rounded-lg hover:shadow-lg transition">
-            <h3 className="text-xl font-bold mb-2">📸 Galeria</h3>
-            <p className="text-gray-600">Veja fotos de nossos eventos</p>
-          </div>
+        {/* Step 1: Escolha do Cardápio */}
+        {step === 1 && (
+          <section className="space-y-6 animate-in">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />
+              <h3 className="font-heading text-xl font-bold text-text-main">
+                Escolha o Cardápio Base
+              </h3>
+            </div>
 
-          <div className="p-6 border rounded-lg hover:shadow-lg transition">
-            <h3 className="text-xl font-bold mb-2">📅 Reservas</h3>
-            <p className="text-gray-600">Faça sua reserva conosco</p>
-          </div>
+            <div className="space-y-3">
+              {cardapios.map((c) => (
+                <CardapioCard
+                  key={c.id}
+                  cardapio={c}
+                  isSelected={selectedCardapio?.id === c.id}
+                  onSelect={handleSelectCardapio}
+                />
+              ))}
+            </div>
 
-          <div className="p-6 border rounded-lg hover:shadow-lg transition">
-            <h3 className="text-xl font-bold mb-2">📞 Contato</h3>
-            <p className="text-gray-600">Entre em contato via WhatsApp</p>
-          </div>
-        </div>
-      </section>
-    </main>
+            {selectedCardapio && (
+              <GuestCounter
+                guests={guests}
+                minGuests={selectedCardapio.minGuests}
+                onChange={setGuests}
+              />
+            )}
+
+            <div className="flex justify-end pt-4">
+              <button
+                onClick={() => setStep(2)}
+                disabled={!canProceedStep1}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-medium text-sm transition-colors duration-200 hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                Personalizar Extras
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Step 2: Extras */}
+        {step === 2 && selectedCardapio && (
+          <section className="space-y-6 animate-in">
+            <GuestCounter
+              guests={guests}
+              minGuests={selectedCardapio.minGuests}
+              onChange={setGuests}
+            />
+
+            {Object.entries(groupedExtras).map(([category, items]) => (
+              <div key={category}>
+                <h3 className="font-heading text-lg font-bold text-text-main mb-3">
+                  {categoryLabels[category] || category}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {items.map((extra) => (
+                    <ExtraCard
+                      key={extra.id}
+                      extra={extra}
+                      isSelected={selectedExtras.some((e) => e.id === extra.id)}
+                      guests={guests}
+                      onToggle={toggleExtra}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setStep(1)}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border-light text-text-muted font-medium text-sm transition-colors duration-200 hover:border-primary hover:text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+                Voltar
+              </button>
+              <button
+                onClick={() => setStep(3)}
+                disabled={!canProceedStep2}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-medium text-sm transition-colors duration-200 hover:bg-primary-dark cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                Ver Resumo
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Step 3: Resumo */}
+        {step === 3 && selectedCardapio && (
+          <section className="animate-in">
+            <BudgetSummary
+              cardapio={selectedCardapio}
+              extras={selectedExtras}
+              guests={guests}
+              onBack={() => setStep(2)}
+            />
+          </section>
+        )}
+      </main>
+
+      <StickyTotal
+        cardapio={selectedCardapio}
+        extras={selectedExtras}
+        guests={guests}
+      />
+    </div>
   )
 }
