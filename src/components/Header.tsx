@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UtensilsCrossed, Phone, Menu, X, ChevronDown } from 'lucide-react'
+import Image from 'next/image'
+import { Phone, Menu, X, ChevronDown } from 'lucide-react'
 
 const navLinks = [
   { href: '/', label: 'Início' },
@@ -38,25 +39,17 @@ export default function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 sm:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg p-1"
+          className="flex items-center gap-2 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg"
           aria-label="Regallos Gastronomia - Página inicial"
         >
-          <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
-            <UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6 text-primary" aria-hidden="true" />
-          </div>
-          <div className="hidden sm:block">
-            <span className="font-heading text-lg sm:text-xl font-semibold text-primary tracking-wide block leading-tight">
-              Regallos
-            </span>
-            <span className="text-[9px] sm:text-[10px] text-accent font-semibold tracking-widest uppercase">
-              Gastronomia
-            </span>
-          </div>
-          <div className="sm:hidden">
-            <span className="font-heading text-base font-semibold text-primary tracking-wide">
-              Regallos
-            </span>
-          </div>
+          <Image
+            src="/logo-horizontal.svg"
+            alt="Regallos Gastronomia"
+            width={160}
+            height={60}
+            className="h-10 sm:h-12 w-auto transition-opacity duration-200 group-hover:opacity-80"
+            priority
+          />
         </Link>
 
         {/* Desktop Navigation */}

@@ -1,18 +1,31 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Zap } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-const galleryItems = [
+const allGalleryItems = [
   { id: 1, title: 'Evento Corporativo', span: 'col-span-1 row-span-1' },
-  { id: 2, title: 'Detalhe de Apresentação', span: 'col-span-1 row-span-2' },
+  { id: 2, title: 'Detalhe de Apresentação', span: 'col-span-1 row-span-1' },
   { id: 3, title: 'Montagem de Mesa', span: 'col-span-1 row-span-1' },
-  { id: 4, title: 'Celebração Social', span: 'col-span-2 row-span-1' },
+  { id: 4, title: 'Celebração Social', span: 'col-span-1 row-span-1' },
   { id: 5, title: 'Gastronomia', span: 'col-span-1 row-span-1' },
   { id: 6, title: 'Atendimento', span: 'col-span-1 row-span-1' },
+  { id: 7, title: 'Buffet Premium', span: 'col-span-1 row-span-1' },
+  { id: 8, title: 'Decoração Elegante', span: 'col-span-1 row-span-1' },
+  { id: 9, title: 'Serviço Refinado', span: 'col-span-1 row-span-1' },
+  { id: 10, title: 'Pratos Especiais', span: 'col-span-1 row-span-1' },
+  { id: 11, title: 'Ambiente Sofisticado', span: 'col-span-1 row-span-1' },
+  { id: 12, title: 'Momento Especial', span: 'col-span-1 row-span-1' },
+  { id: 13, title: 'Detalhes Requintados', span: 'col-span-1 row-span-1' },
+  { id: 14, title: 'Apresentação Impecável', span: 'col-span-1 row-span-1' },
+  { id: 15, title: 'Convidados Felizes', span: 'col-span-1 row-span-1' },
+  { id: 16, title: 'Sucesso Total', span: 'col-span-1 row-span-1' },
 ]
 
 export default function GaleriaSection() {
+  const [currentPage, setCurrentPage] = useState(0)
+  const galleryItems = currentPage === 0 ? allGalleryItems.slice(0, 8) : allGalleryItems.slice(8, 16)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -36,7 +49,7 @@ export default function GaleriaSection() {
   }
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 bg-background-warm">
+    <section className="relative py-10 sm:py-14 lg:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
@@ -46,14 +59,14 @@ export default function GaleriaSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 sm:mb-16"
         >
-          <div className="flex justify-center mb-4">
-            <div className="h-1 w-12 bg-accent rounded-full" />
-          </div>
+          <span className="text-xs font-semibold text-accent tracking-widest uppercase mb-4 block">
+            Nossos Eventos
+          </span>
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main mb-4">
-            Galeria de Eventos
+            Galeria
           </h2>
           <p className="text-text-muted text-base sm:text-lg max-w-2xl mx-auto">
-            Veja o cuidado, qualidade e elegância em cada evento que criamos.
+            Uma seleção dos nossos eventos.
           </p>
         </motion.div>
 
@@ -73,10 +86,10 @@ export default function GaleriaSection() {
               className={`${item.span} group relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/20 via-primary/10 to-accent/5 border border-border-light/50 cursor-pointer`}
             >
               {/* Placeholder content */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <div className="absolute inset-0 flex items-center justify-center bg-background-warm">
                 <div className="text-center">
-                  <Zap className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-xs text-gray-400 font-medium">{item.title}</p>
+                  <p className="text-2xl text-text-muted/20 mx-auto mb-1">📷</p>
+                  <p className="text-xs text-text-muted/40 font-medium">{item.title}</p>
                 </div>
               </div>
 
@@ -93,26 +106,42 @@ export default function GaleriaSection() {
           ))}
         </motion.div>
 
-        {/* CTA Below Gallery */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mt-12 sm:mt-16"
-        >
-          <p className="text-text-muted text-base sm:text-lg mb-4">
-            Quer ver mais? Explore nossos cardápios e dê o primeiro passo.
-          </p>
-          <a
-            href="https://wa.me/5511947588959?text=Olá!%20Gostaria%20de%20mais%20informações%20e%20fotos%20dos%20nossos%20eventos."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transition-all duration-200 hover:bg-primary/5 hover:shadow-card active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer"
+        {/* Navigation arrows */}
+        <div className="flex items-center justify-center gap-4 mt-10 sm:mt-12">
+          <motion.button
+            whileHover={{ x: -3 }}
+            onClick={() => setCurrentPage(0)}
+            disabled={currentPage === 0}
+            className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white transition-all duration-200 hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-elevated active:scale-95"
+            aria-label="Fotos anteriores"
           >
-            Ver Mais Fotos
-          </a>
-        </motion.div>
+            <ChevronLeft className="w-5 h-5" />
+          </motion.button>
+
+          <div className="flex items-center gap-2">
+            {[0, 1].map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  currentPage === page ? 'bg-primary w-6' : 'bg-border-light hover:bg-primary/50'
+                }`}
+                aria-label={`Ir para grupo ${page + 1}`}
+              />
+            ))}
+          </div>
+
+          <motion.button
+            whileHover={{ x: 3 }}
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white transition-all duration-200 hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-elevated active:scale-95"
+            aria-label="Próximas fotos"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </motion.button>
+        </div>
+
       </div>
     </section>
   )

@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { UtensilsCrossed, Phone, MapPin, Instagram, Clock } from 'lucide-react'
+import Image from 'next/image'
+import { Phone, MapPin, Instagram, Clock } from 'lucide-react'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -15,18 +16,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-lg p-1">
-              <div className="p-1.5 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors duration-200">
-                <UtensilsCrossed className="w-5 h-5 text-accent" />
-              </div>
-              <div>
-                <span className="font-heading text-lg font-semibold text-white block leading-tight">
-                  Regallos
-                </span>
-                <span className="text-[10px] text-accent font-semibold tracking-widest uppercase">
-                  Gastronomia
-                </span>
-              </div>
+            <Link href="/" className="inline-block cursor-pointer group focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-lg">
+              <Image
+                src="/logo-horizontal.svg"
+                alt="Regallos Gastronomia"
+                width={160}
+                height={60}
+                className="h-10 w-auto brightness-0 invert transition-opacity duration-200 group-hover:opacity-80"
+              />
             </Link>
             <p className="text-sm text-white/70 leading-relaxed max-w-xs">
               Há 14 anos transformando eventos em experiências gastronômicas inesquecíveis. Qualidade, cuidado e sabor em cada detalhe.

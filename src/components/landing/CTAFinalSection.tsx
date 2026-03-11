@@ -5,12 +5,7 @@ import { Phone, Mail, ArrowRight } from 'lucide-react'
 
 export default function CTAFinalSection() {
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 bg-background-dark overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -mr-48" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -ml-48" />
-      </div>
+    <section className="relative py-10 sm:py-14 lg:py-16 bg-background-dark overflow-hidden border-t border-white/5">
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -20,20 +15,16 @@ export default function CTAFinalSection() {
           transition={{ duration: 0.7 }}
           className="text-center space-y-8"
         >
-          {/* Decorative line */}
-          <div className="flex justify-center">
-            <div className="h-1 w-12 bg-accent rounded-full" />
-          </div>
 
           {/* Main headline */}
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight text-balance">
-            Vamos Criar Algo
-            <span className="block text-accent">Memorável Juntos?</span>
+            Pronto Para Seu
+            <span className="block text-accent">Próximo Evento?</span>
           </h2>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-            Cada evento é uma oportunidade de criar uma experiência única. Estamos prontos para transformar sua visão em realidade.
+            Entre em contato e vamos criar uma experiência gastronômica memorável para você.
           </p>
 
           {/* CTA Buttons */}
@@ -52,25 +43,21 @@ export default function CTAFinalSection() {
               className="inline-flex items-center justify-center gap-2 bg-accent text-background-dark px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transition-all duration-200 hover:bg-accent-light hover:shadow-elevated active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background-dark cursor-pointer group"
             >
               <Phone className="w-5 h-5" />
-              <span className="hidden sm:inline">Solicitar via WhatsApp</span>
+              <span className="hidden sm:inline">Solicitar Orçamento</span>
               <span className="sm:hidden">WhatsApp</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
 
-            {/* Contact form CTA (optional) */}
-            <button
+            {/* Secondary CTA */}
+            <a
+              href="https://wa.me/5511947588959?text=Olá!%20Gostaria%20de%20conhecer%20mais%20sobre%20os%20cardápios."
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold transition-all duration-200 hover:bg-white/10 hover:shadow-card active:scale-95 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-background-dark cursor-pointer"
-              onClick={() => {
-                // Scroll to contact form or open modal
-                const contactElement = document.getElementById('contact-form')
-                if (contactElement) {
-                  contactElement.scrollIntoView({ behavior: 'smooth' })
-                }
-              }}
             >
               <Mail className="w-5 h-5" />
-              <span>Fale Conosco</span>
-            </button>
+              <span>Conhecer Cardápios</span>
+            </a>
           </motion.div>
 
           {/* Additional contact info */}

@@ -4,18 +4,10 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Heart } from 'lucide-react'
 
-const socialEvents = [
-  'Aniversários memoráveis',
-  'Recepções elegantes',
-  'Encontros especiais',
-  'Celebrações íntimas',
-  'Eventos em casa',
-  'Confraternizações',
-]
 
 export default function SocialSection() {
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 bg-white overflow-hidden">
+    <section className="relative py-10 sm:py-14 lg:py-16 bg-background-warm overflow-hidden">
       {/* Background accent */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -ml-48" />
@@ -31,32 +23,14 @@ export default function SocialSection() {
             transition={{ duration: 0.7 }}
             className="relative order-2 lg:order-1 hidden lg:block"
           >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/20 via-primary/10 to-accent/5 aspect-[4/5]">
+            <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <Heart className="w-16 h-16 text-accent/30 mx-auto mb-4" />
-                  <p className="text-text-muted/30 font-medium">Evento social</p>
+                  <Heart className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
+                  <p className="text-xs text-text-muted/40 font-medium">Evento social</p>
                 </div>
               </div>
-
-              {/* Decorative elements */}
-              <div className="absolute top-8 right-8 w-28 h-28 border-2 border-accent/40 rounded-full" />
-              <div className="absolute bottom-8 left-8 w-32 h-32 border-2 border-primary/20 rounded-xl rotate-12" />
             </div>
-
-            {/* Floating badge */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-elevated p-4 max-w-xs hidden xl:block"
-            >
-              <p className="text-sm font-semibold text-primary flex items-center gap-2 mb-1">
-                ♦ Personalização
-              </p>
-              <p className="text-xs text-text-muted">
-                Cada detalhe pensado para seu estilo
-              </p>
-            </motion.div>
           </motion.div>
 
           {/* Text content */}
@@ -68,35 +42,17 @@ export default function SocialSection() {
             className="order-1 lg:order-2"
           >
             <div className="space-y-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-accent rounded-full" />
-                <span className="text-sm font-semibold text-accent tracking-wide uppercase">
-                  Para Celebrações
-                </span>
-              </div>
+              <span className="text-xs font-semibold text-accent tracking-widest uppercase">
+                Para Eventos Sociais
+              </span>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight">
-                Celebrações que Ficam na Memória
+                Receba com Charme, Conforto e Sofisticação
               </h2>
             </div>
 
             <p className="text-text-muted text-base sm:text-lg leading-relaxed mb-8">
-              Seus momentos especiais merecem algo extraordinário. Transformamos celebrações em experiências refinadas, com cardápios pensados no seu gosto e apresentação que impressiona.
+              Cardápios pensados para diferentes ocasiões, com apresentação impecável e serviço atencioso para que você aproveite cada momento ao lado dos seus convidados.
             </p>
-
-            {/* Event types */}
-            <div className="mb-10">
-              <p className="text-sm font-semibold text-text-main mb-4">
-                Celebramos:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {socialEvents.map((event, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
-                    <span className="text-text-muted text-sm sm:text-base">{event}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* CTA */}
             <motion.div

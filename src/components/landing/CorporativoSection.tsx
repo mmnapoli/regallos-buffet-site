@@ -4,18 +4,10 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Briefcase } from 'lucide-react'
 
-const corporateEvents = [
-  'Coffee Breaks & Recepções',
-  'Convenções e Conferences',
-  'Encontros Corporativos',
-  'Coquetéis e Celebrações',
-  'Brunches Executivos',
-  'Confraternizações',
-]
 
 export default function CorporativoSection() {
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 bg-background-warm overflow-hidden">
+    <section className="relative py-10 sm:py-14 lg:py-16 bg-background-warm overflow-hidden">
       {/* Background accent */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -mr-48" />
@@ -31,35 +23,18 @@ export default function CorporativoSection() {
             transition={{ duration: 0.7 }}
           >
             <div className="space-y-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-12 bg-accent rounded-full" />
-                <span className="text-sm font-semibold text-accent tracking-wide uppercase">
-                  Para Empresas
-                </span>
-              </div>
+              <span className="text-xs font-semibold text-accent tracking-widest uppercase">
+                Para Empresas
+              </span>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight">
-                Eventos Corporativos com Precisão
+                Eventos Corporativos Sofisticados
               </h2>
             </div>
 
             <p className="text-text-muted text-base sm:text-lg leading-relaxed mb-8">
-              Sua empresa merece um evento tão profissional quanto você. Entendemos as necessidades de eventos B2B: pontualidade, qualidade impecável, discrição e logística refinada.
+              Levamos toda a estrutura necessária para o seu evento ser um sucesso. Nossa equipe treinada garante pontualidade, apresentação impecável e atendimento atencioso a cada detalhe.
             </p>
 
-            {/* Event types */}
-            <div className="mb-10">
-              <p className="text-sm font-semibold text-text-main mb-4">
-                Especializados em:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {corporateEvents.map((event, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-                    <span className="text-text-muted text-sm sm:text-base">{event}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* CTA */}
             <motion.div
@@ -86,32 +61,14 @@ export default function CorporativoSection() {
             transition={{ duration: 0.7 }}
             className="relative hidden lg:block"
           >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/10 to-primary/5 aspect-[4/5]">
+            <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <Briefcase className="w-16 h-16 text-primary/30 mx-auto mb-4" />
-                  <p className="text-text-muted/30 font-medium">Evento corporativo</p>
+                  <Briefcase className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
+                  <p className="text-xs text-text-muted/40 font-medium">Evento corporativo</p>
                 </div>
               </div>
-
-              {/* Decorative elements */}
-              <div className="absolute top-8 left-8 w-24 h-24 border-2 border-accent/30 rounded-xl" />
-              <div className="absolute bottom-8 right-8 w-32 h-32 border-2 border-primary/20 rounded-full" />
             </div>
-
-            {/* Floating badge */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-elevated p-4 max-w-xs hidden xl:block"
-            >
-              <p className="text-sm font-semibold text-primary flex items-center gap-2 mb-1">
-                ✓ Suporte Total
-              </p>
-              <p className="text-xs text-text-muted">
-                Do planejamento à limpeza final
-              </p>
-            </motion.div>
           </motion.div>
         </div>
       </div>
