@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UtensilsCrossed, Phone, Menu, X } from 'lucide-react'
+import { UtensilsCrossed, Phone, Menu, X, ChevronDown } from 'lucide-react'
 
 const navLinks = [
   { href: '/', label: 'Início' },
@@ -15,23 +15,52 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [hasScrolled, setHasScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setHasScrolled(window.scrollY > 10)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border-light/50">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 cursor-pointer" aria-label="Regallos Gastronomia - Página inicial">
-          <UtensilsCrossed className="w-7 h-7 text-primary" aria-hidden="true" />
-          <div>
-            <span className="font-heading text-xl font-bold text-primary tracking-wide block leading-tight">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        hasScrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-soft'
+          : 'bg-white/50 backdrop-blur-sm'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg p-1"
+          aria-label="Regallos Gastronomia - Página inicial"
+        >
+          <div className="p-1.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
+            <UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6 text-primary" aria-hidden="true" />
+          </div>
+          <div className="hidden sm:block">
+            <span className="font-heading text-lg sm:text-xl font-semibold text-primary tracking-wide block leading-tight">
               Regallos
             </span>
-            <span className="text-[10px] text-accent font-medium tracking-[0.2em] uppercase">
-              Gastronomia & Eventos
+            <span className="text-[9px] sm:text-[10px] text-accent font-semibold tracking-widest uppercase">
+              Gastronomia
+            </span>
+          </div>
+          <div className="sm:hidden">
+            <span className="font-heading text-base font-semibold text-primary tracking-wide">
+              Regallos
             </span>
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1" aria-label="Menu principal">
+        {/* Desktop Navigation */}
+        <nav className="hidden lg:flex items-center gap-1" aria-label="Menu principal">
           {navLinks.map((link) => {
             const isActive = link.href === '/'
               ? pathname === '/'
@@ -40,46 +69,57 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer
+                className={`px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg cursor-pointer relative group
                   ${isActive
-                    ? 'text-primary bg-primary/5'
-                    : 'text-text-muted hover:text-text-main hover:bg-background-warm'
+                    ? 'text-primary'
+                    : 'text-text-muted hover:text-text-main'
                   }
                 `}
               >
                 {link.label}
+                <span
+                  className={`absolute bottom-1 left-0 h-0.5 bg-accent transition-all duration-300 ${
+                    isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
+                />
               </Link>
             )
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* CTA and Mobile Menu */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <a
-            href="https://wa.me/5511947588959?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20servi%C3%A7os%20do%20Buffet%20Regallos."
+            href="https://wa.me/5511947588959?text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento%20para%20meu%20evento."
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 hover:bg-primary-dark cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            aria-label="Entrar em contato via WhatsApp"
+            className="hidden sm:inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 hover:bg-primary-dark hover:shadow-card active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer"
+            aria-label="Solicitar orçamento via WhatsApp"
           >
-            <Phone className="w-4 h-4" aria-hidden="true" />
-            Contato
+            <span className="hidden md:inline">Solicitar Orçamento</span>
+            <span className="md:hidden">Orçamento</span>
           </a>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-background-warm transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+            className="lg:hidden p-2 rounded-lg hover:bg-background-warm transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
             aria-label={mobileOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen
-              ? <X className="w-5 h-5" aria-hidden="true" />
-              : <Menu className="w-5 h-5" aria-hidden="true" />
+              ? <X className="w-5 h-5 text-primary" aria-hidden="true" />
+              : <Menu className="w-5 h-5 text-primary" aria-hidden="true" />
             }
           </button>
         </div>
       </div>
 
+      {/* Mobile Navigation */}
       {mobileOpen && (
-        <nav className="md:hidden border-t border-border-light bg-white px-4 py-3 space-y-1" aria-label="Menu mobile">
+        <nav
+          className="lg:hidden border-t border-border-light/30 bg-white/95 backdrop-blur-sm px-4 py-3 space-y-2"
+          aria-label="Menu mobile"
+        >
           {navLinks.map((link) => {
             const isActive = link.href === '/'
               ? pathname === '/'
@@ -89,12 +129,11 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer
-                  ${isActive
-                    ? 'text-primary bg-primary/5'
+                className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'text-primary bg-primary/10'
                     : 'text-text-muted hover:text-text-main hover:bg-background-warm'
-                  }
-                `}
+                }`}
               >
                 {link.label}
               </Link>
@@ -104,7 +143,7 @@ export default function Header() {
             href="https://wa.me/5511947588959"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2.5 text-primary text-sm font-medium cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 text-primary text-sm font-medium cursor-pointer rounded-lg hover:bg-primary/5 transition-colors duration-200"
           >
             <Phone className="w-4 h-4" aria-hidden="true" />
             (11) 94758-8959
