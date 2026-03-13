@@ -32,6 +32,7 @@ interface ImageUploaderProps {
   onUploadComplete: (url: string) => void
   label?: string
   aspectRatio?: string
+  multiple?: boolean
 }
 
 export default function ImageUploader({
@@ -40,40 +41,56 @@ export default function ImageUploader({
   onUploadComplete,
   label = 'Clique para selecionar imagem',
   aspectRatio = 'aspect-video',
+  multiple = false,
 }: ImageUploaderProps) {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [previewSrc, setPreviewSrc] = useState<string | undefined>(currentSrc)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    // Limit if not multiple
+    const filesToProcess = multiple ? files : [files[0]]
 
     // Local validation
-    const buffer = await file.arrayBuffer()
-    const validation = validateImageFile(buffer, file.type, file.size)
-
-    if (!validation.valid) {
-      setStatus('error')
-      setErrorMsg(validation.error || 'Erro na validação')
-      setTimeout(() => setStatus('idle'), 3000)
-      return
+    for (const file of filesToProcess) {
+      const buffer = await file.slice(0, 512).arrayBuffer() // just checking basically but actual buffer check was full previously
+      const validation = validateImageFile(await file.arrayBuffer(), file.type, file.size)
+      if (!validation.valid) {
+        setStatus('error')
+        setErrorMsg(`Erro em ${file.name}: ${validation.error}`)
+        setTimeout(() => setStatus('idle'), 3000)
+        return
+      }
     }
 
     try {
       setStatus('uploading')
       setErrorMsg(null)
+      if (multiple) {
+        setUploadProgress({ current: 0, total: filesToProcess.length })
+      }
 
-      const { url } = await uploadImage(file, subfolder)
+      for (let i = 0; i < filesToProcess.length; i++) {
+        const file = filesToProcess[i]
+        const { url } = await uploadImage(file, subfolder)
+        setPreviewSrc(url)
+        onUploadComplete(url)
+        if (multiple) {
+          setUploadProgress({ current: i + 1, total: filesToProcess.length })
+        }
+      }
 
-      setPreviewSrc(url)
       setStatus('success')
-      onUploadComplete(url)
-
+      setUploadProgress(null)
       setTimeout(() => setStatus('idle'), 2000)
     } catch (error: any) {
       setStatus('error')
+      setUploadProgress(null)
       setErrorMsg(error.message || 'Erro ao fazer upload')
       setTimeout(() => setStatus('idle'), 3000)
     }
@@ -93,6 +110,7 @@ export default function ImageUploader({
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          multiple={multiple}
           onChange={handleFileSelect}
           className="hidden"
           disabled={status === 'uploading'}
@@ -127,7 +145,11 @@ export default function ImageUploader({
               {status === 'uploading' && (
                 <>
                   <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
-                  <p className="text-xs text-text-muted">Enviando...</p>
+                  <p className="text-xs text-text-muted">
+                    {uploadProgress && multiple
+                      ? `Enviando ${uploadProgress.current}/${uploadProgress.total}...`
+                      : 'Enviando...'}
+                  </p>
                 </>
               )}
               {status === 'error' && (

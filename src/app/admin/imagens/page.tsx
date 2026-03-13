@@ -9,28 +9,108 @@ import {
   updateGalleryImage,
   fetchSiteImages,
   updateSectionImage,
-  updateCardapioImage,
-  updateLogo,
+  reorderGallery,
 } from '@/lib/api-client'
 import { GalleryImageDB, SiteImagesDB } from '@/lib/types'
 import ImageUploader from '@/components/admin/ImageUploader'
-import { Trash2, ArrowUp, ArrowDown } from 'lucide-react'
+import { Trash2, GripVertical } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+// A wrapper component for a sortable gallery item
+function SortableGalleryItem({
+  img,
+  onDelete
+}: {
+  img: GalleryImageDB
+  onDelete: (id: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: img.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 2 : 1,
+    opacity: isDragging ? 0.8 : 1
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white rounded-lg border border-border-light overflow-hidden space-y-3 p-3 flex flex-col items-center relative"
+    >
+      <div 
+        className="absolute top-2 left-2 z-10 p-1 bg-white/80 backdrop-blur rounded cursor-grab active:cursor-grabbing hover:bg-white text-text-muted shadow-sm"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="w-4 h-4" />
+      </div>
+
+      <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-background-warm">
+        <Image
+          src={img.src}
+          alt="Foto da galeria"
+          fill
+          className="object-cover pointer-events-none"
+        />
+      </div>
+
+      <div className="flex gap-2 mt-2 w-full">
+        <button
+          onClick={() => onDelete(img.id)}
+          className="w-full px-2 py-2 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100 flex items-center justify-center gap-2 font-medium"
+          title="Deletar imagem"
+        >
+          <Trash2 className="w-4 h-4" />
+          Excluir
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function ImagensAdminPage() {
-  const [activeTab, setActiveTab] = useState<'galeria' | 'secoes' | 'logo'>('galeria')
+  const [activeTab, setActiveTab] = useState<'galeria' | 'secoes'>('galeria')
   const [gallery, setGallery] = useState<GalleryImageDB[]>([])
   const [siteImages, setSiteImages] = useState<SiteImagesDB | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [pendingNewImage, setPendingNewImage] = useState<{ src: string } | null>(null)
-  const [newImageForm, setNewImageForm] = useState<{ alt: string; span: 'normal' | 'large' | 'tall' }>({ alt: '', span: 'normal' })
 
-  // Cardapios list (hardcoded from mock data)
-  const cardapios = [
-    { id: 'card_feijoada', name: 'Feijoada Premium' },
-    { id: 'card_churrasco', name: 'Churrasco Completo' },
-    { id: 'card_fingerfood', name: 'Finger Food' },
-  ]
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Requires minimum moving of 5px before drag starts, to allow clicks on buttons
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     loadData()
@@ -54,21 +134,14 @@ export default function ImagensAdminPage() {
   }
 
   // Gallery handlers
-  const handleGalleryUploadComplete = (url: string) => {
-    setPendingNewImage({ src: url })
-  }
-
-  const handleConfirmNewImage = async () => {
-    if (!pendingNewImage) return
+  const handleGalleryUploadComplete = async (url: string) => {
     try {
       const newImage = await addGalleryImage({
-        src: pendingNewImage.src,
-        alt: newImageForm.alt || 'Foto do evento',
-        span: newImageForm.span as 'large' | 'tall' | 'normal',
+        src: url,
+        alt: '',
+        span: 'normal',
       })
       setGallery((prev) => [...prev, newImage])
-      setPendingNewImage(null)
-      setNewImageForm({ alt: '', span: 'normal' })
     } catch (err: any) {
       alert(err.message)
     }
@@ -84,37 +157,25 @@ export default function ImagensAdminPage() {
     }
   }
 
-  const handleMoveImage = async (index: number, direction: 'up' | 'down') => {
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= gallery.length) return
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
 
-    const orderedIds = gallery.map((img) => img.id)
-    ;[orderedIds[index], orderedIds[newIndex]] = [orderedIds[newIndex], orderedIds[index]]
-
-    try {
-      await fetchGallery() // Reorder via reorder endpoint would be ideal, but we'll refresh
-      // For now, just let the UI update optimistically
-      setGallery((prev) => {
-        const newGallery = [...prev]
-        ;[newGallery[index], newGallery[newIndex]] = [newGallery[newIndex], newGallery[index]]
-        newGallery.forEach((img, i) => {
-          img.order = i
-        })
-        return newGallery
+    if (over && active.id !== over.id) {
+      setGallery((items) => {
+        const oldIndex = items.findIndex((i) => i.id === active.id)
+        const newIndex = items.findIndex((i) => i.id === over.id)
+        
+        const newArray = arrayMove(items, oldIndex, newIndex)
+        
+        // Optimistic update of orders
+        newArray.forEach((img, i) => { img.order = i })
+        
+        // Save to backend
+        const orderedIds = newArray.map(img => img.id)
+        reorderGallery(orderedIds).catch(err => alert("Erro ao salvar ordem: " + err.message))
+        
+        return newArray
       })
-    } catch (err: any) {
-      alert(err.message)
-    }
-  }
-
-  const handleUpdateGalleryImageAlt = async (id: string, alt: string) => {
-    try {
-      const updated = await updateGalleryImage(id, { alt })
-      setGallery((prev) =>
-        prev.map((img) => (img.id === id ? updated : img))
-      )
-    } catch (err: any) {
-      alert(err.message)
     }
   }
 
@@ -126,28 +187,6 @@ export default function ImagensAdminPage() {
   ) => {
     try {
       const updated = await updateSectionImage(section, url, alt)
-      setSiteImages(updated)
-    } catch (err: any) {
-      alert(err.message)
-    }
-  }
-
-  const handleCardapioImageUpload = async (
-    cardapioId: string,
-    url: string,
-    alt: string
-  ) => {
-    try {
-      const updated = await updateCardapioImage(cardapioId, url, alt)
-      setSiteImages(updated)
-    } catch (err: any) {
-      alert(err.message)
-    }
-  }
-
-  const handleLogoUpload = async (url: string) => {
-    try {
-      const updated = await updateLogo(url)
       setSiteImages(updated)
     } catch (err: any) {
       alert(err.message)
@@ -207,16 +246,6 @@ export default function ImagensAdminPage() {
         >
           Seções do Site
         </button>
-        <button
-          onClick={() => setActiveTab('logo')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-            activeTab === 'logo'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-text-muted hover:text-text-main'
-          }`}
-        >
-          Logo
-        </button>
       </div>
 
       {/* Tab: Galeria */}
@@ -225,67 +254,15 @@ export default function ImagensAdminPage() {
           {/* New image section */}
           <div className="bg-white rounded-lg border border-border-light p-6">
             <h3 className="text-lg font-semibold text-text-main mb-4">
-              Adicionar Nova Imagem
+              Adicionar Imagens
             </h3>
             <ImageUploader
               subfolder="gallery"
+              multiple={true}
+              aspectRatio="aspect-[4/1]"
               onUploadComplete={handleGalleryUploadComplete}
-              label="Selecione uma imagem para a galeria"
+              label="Solte imagens aqui ou clique para selecionar"
             />
-
-            {pendingNewImage && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-text-main mb-1">
-                    Descrição da imagem
-                  </label>
-                  <input
-                    type="text"
-                    value={newImageForm.alt}
-                    onChange={(e) =>
-                      setNewImageForm((prev) => ({ ...prev, alt: e.target.value }))
-                    }
-                    placeholder="ex: Mesa de buffet"
-                    className="w-full px-3 py-2 border border-border-light rounded-lg"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-text-main mb-1">
-                    Tamanho na galeria
-                  </label>
-                  <select
-                    value={newImageForm.span}
-                    onChange={(e) =>
-                      setNewImageForm((prev) => ({
-                        ...prev,
-                        span: e.target.value as 'normal' | 'large' | 'tall',
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-border-light rounded-lg"
-                  >
-                    <option value="normal">Normal</option>
-                    <option value="large">Larga</option>
-                    <option value="tall">Alta</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleConfirmNewImage}
-                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    onClick={() => setPendingNewImage(null)}
-                    className="px-4 py-2 border border-border-light rounded-lg hover:bg-background-warm transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Gallery grid */}
@@ -299,131 +276,31 @@ export default function ImagensAdminPage() {
                 Nenhuma imagem na galeria ainda
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {gallery.map((img, index) => (
-                  <div
-                    key={img.id}
-                    className="bg-white rounded-lg border border-border-light overflow-hidden space-y-3 p-3"
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-background-warm">
-                      <Image
-                        src={img.src}
-                        alt={img.alt}
-                        fill
-                        className="object-cover"
+              <DndContext 
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext 
+                  items={gallery.map(g => g.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {gallery.map((img) => (
+                      <SortableGalleryItem 
+                        key={img.id} 
+                        img={img} 
+                        onDelete={handleDeleteGalleryImage} 
                       />
-                    </div>
-
-                    {/* Alt text */}
-                    <input
-                      type="text"
-                      value={img.alt}
-                      onChange={(e) => handleUpdateGalleryImageAlt(img.id, e.target.value)}
-                      className="w-full px-2 py-1 text-sm border border-border-light rounded"
-                      placeholder="Descrição da imagem"
-                    />
-
-                    {/* Size badge */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                        {img.span === 'large'
-                          ? 'Larga'
-                          : img.span === 'tall'
-                            ? 'Alta'
-                            : 'Normal'}
-                      </span>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleMoveImage(index, 'up')}
-                        disabled={index === 0}
-                        className="flex-1 px-2 py-1 text-sm bg-background-warm rounded hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                        title="Mover para cima"
-                      >
-                        <ArrowUp className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleMoveImage(index, 'down')}
-                        disabled={index === gallery.length - 1}
-                        className="flex-1 px-2 py-1 text-sm bg-background-warm rounded hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                        title="Mover para baixo"
-                      >
-                        <ArrowDown className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteGalleryImage(img.id)}
-                        className="flex-1 px-2 py-1 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100 flex items-center justify-center gap-1"
-                        title="Deletar imagem"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         </div>
       )}
 
-      {/* Tab: Logo */}
-      {activeTab === 'logo' && siteImages && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-lg border border-border-light p-6">
-            <h3 className="text-lg font-semibold text-text-main mb-4">
-              Gerenciar Logo
-            </h3>
-            <p className="text-text-muted text-sm mb-6">
-              Este logo aparece no cabeçalho, rodapé e na seção principal do site.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Current logo preview */}
-              <div>
-                <h4 className="font-medium text-text-main mb-3">Logo Atual</h4>
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-background-warm border border-border-light flex items-center justify-center p-4">
-                  {siteImages.logo ? (
-                    <Image
-                      src={siteImages.logo}
-                      alt="Logo Regallos"
-                      width={280}
-                      height={105}
-                      className="object-contain"
-                    />
-                  ) : (
-                    <Image
-                      src="/logo-horizontal.svg"
-                      alt="Logo padrão Regallos"
-                      width={280}
-                      height={105}
-                      className="object-contain"
-                    />
-                  )}
-                </div>
-                {siteImages.logo && (
-                  <p className="text-xs text-text-muted mt-2">Logo personalizado</p>
-                )}
-                {!siteImages.logo && (
-                  <p className="text-xs text-text-muted mt-2">Logo padrão</p>
-                )}
-              </div>
-
-              {/* Upload new logo */}
-              <div>
-                <h4 className="font-medium text-text-main mb-3">Novo Logo</h4>
-                <ImageUploader
-                  subfolder="logo"
-                  onUploadComplete={handleLogoUpload}
-                  label="Selecione uma imagem/SVG para o logo"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Tab: Seções */}
       {activeTab === 'secoes' && siteImages && (
@@ -431,24 +308,8 @@ export default function ImagensAdminPage() {
           {/* Main sections */}
           <div className="bg-white rounded-lg border border-border-light p-6 space-y-6">
             <h3 className="text-lg font-semibold text-text-main">
-              Seções do Site
+              Seções de Eventos
             </h3>
-
-            {/* Hero */}
-            <SectionImageEditor
-              title="Hero"
-              section="hero"
-              image={siteImages.sections.hero}
-              onUpload={(url, alt) => handleSectionImageUpload('hero', url, alt)}
-            />
-
-            {/* Sobre */}
-            <SectionImageEditor
-              title="Sobre Nós"
-              section="sobre"
-              image={siteImages.sections.sobre}
-              onUpload={(url, alt) => handleSectionImageUpload('sobre', url, alt)}
-            />
 
             {/* Corporativo */}
             <SectionImageEditor
@@ -465,23 +326,6 @@ export default function ImagensAdminPage() {
               image={siteImages.sections.social}
               onUpload={(url, alt) => handleSectionImageUpload('social', url, alt)}
             />
-          </div>
-
-          {/* Cardapios */}
-          <div className="bg-white rounded-lg border border-border-light p-6 space-y-6">
-            <h3 className="text-lg font-semibold text-text-main">
-              Imagens dos Cardápios
-            </h3>
-
-            {cardapios.map((cardapio) => (
-              <SectionImageEditor
-                key={cardapio.id}
-                title={cardapio.name}
-                section={cardapio.id}
-                image={siteImages.cardapios[cardapio.id]}
-                onUpload={(url, alt) => handleCardapioImageUpload(cardapio.id, url, alt)}
-              />
-            ))}
           </div>
         </div>
       )}

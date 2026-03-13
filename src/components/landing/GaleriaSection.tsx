@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import BentoGallery from '@/components/BentoGallery'
 import { GalleryImageDB } from '@/lib/types'
 
 export default function GaleriaSection() {
@@ -83,70 +84,17 @@ export default function GaleriaSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[220px] gap-4 sm:gap-5 lg:gap-6"
         >
           {loading ? (
-            <div className="col-span-full text-center py-12">
+            <div className="text-center py-12">
               <p className="text-text-muted">Carregando galeria...</p>
             </div>
           ) : currentItems.length === 0 ? (
-            <div className="col-span-full text-center py-12">
+            <div className="text-center py-12">
               <p className="text-text-muted">Nenhuma imagem na galeria</p>
             </div>
           ) : (
-            currentItems.map((item) => {
-              const hasImage = item.src && !failedImages.has(item.src)
-              const spanClass =
-                item.span === 'large'
-                  ? 'col-span-1 sm:col-span-2 row-span-1 sm:row-span-1'
-                  : item.span === 'tall'
-                    ? 'col-span-1 row-span-1 sm:row-span-2'
-                    : 'col-span-1 row-span-1'
-
-              return (
-                <motion.div
-                  key={item.id}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.02 }}
-                  className={`${spanClass} group relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/20 via-primary/10 to-accent/5 border border-border-light/50 cursor-pointer`}
-                >
-                  {hasImage ? (
-                    <>
-                      <Image
-                        src={item.src}
-                        alt={item.alt}
-                        fill
-                        className="object-cover"
-                        onError={() =>
-                          setFailedImages((prev) => new Set(prev).add(item.src))
-                        }
-                      />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background-warm">
-                      <div className="text-center">
-                        <p className="text-2xl text-text-muted/20 mx-auto mb-1">
-                          📷
-                        </p>
-                        <p className="text-xs text-text-muted/40 font-medium">
-                          {item.alt}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 sm:p-6">
-                    <p className="text-white font-semibold text-sm sm:text-base">
-                      {item.alt}
-                    </p>
-                  </div>
-
-                  {/* Hover effect border */}
-                  <div className="absolute inset-0 rounded-2xl border-2 border-accent/0 group-hover:border-accent/50 transition-colors duration-300 pointer-events-none" />
-                </motion.div>
-              )
-            })
+            <BentoGallery images={currentItems} />
           )}
         </motion.div>
 

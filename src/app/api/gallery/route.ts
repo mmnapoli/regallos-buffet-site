@@ -19,11 +19,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { src, alt, span } = body
+    const { src, alt = '', span = 'normal' } = body
 
-    if (!src || !alt || !span) {
+    if (!src) {
       return NextResponse.json(
-        { error: 'Campos obrigatórios: src, alt, span' },
+        { error: 'O campo src é obrigatório' },
         { status: 400 }
       )
     }

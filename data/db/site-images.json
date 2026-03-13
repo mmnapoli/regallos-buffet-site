@@ -2,9 +2,23 @@
   "sections": {
     "hero": null,
     "sobre": null,
-    "corporativo": null,
-    "social": null
+    "corporativo": {
+      "src": "/uploads/sections/img_1773441332190.png",
+      "alt": "Eventos Corporativos",
+      "uploadedAt": "2026-03-13T22:35:32.214Z"
+    },
+    "social": {
+      "src": "/uploads/sections/img_1773441347275.png",
+      "alt": "Eventos Sociais",
+      "uploadedAt": "2026-03-13T22:35:47.306Z"
+    }
   },
-  "cardapios": {},
-  "logo": "/uploads/logo/img_1773440366463.png"
+  "cardapios": {
+    "card_feijoada": {
+      "src": "/uploads/sections/img_1773440549186.png",
+      "alt": "Feijoada Premium",
+      "uploadedAt": "2026-03-13T22:22:29.211Z"
+    }
+  },
+  "logo": "/uploads/logo/img_1773440485735.svg"
 }
