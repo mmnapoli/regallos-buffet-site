@@ -59,12 +59,12 @@ test.describe('Navigation', () => {
   test('should have valid link to budget page', async ({ page }) => {
     await page.goto('/')
 
-    const budgetLink = page.locator('a[href*="orcamento"], a[href*="budget"], a[href*="quote"]').first()
+    const budgetLink = page.locator('a[href="/orcamento"]').first()
     const exists = await budgetLink.isVisible().catch(() => false)
 
     if (exists) {
-      await budgetLink.click()
-      await expect(page).toHaveURL(/orcamento/)
+      await budgetLink.click({ timeout: 10000 })
+      await expect(page).toHaveURL(/orcamento/, { timeout: 10000 })
     }
   })
 

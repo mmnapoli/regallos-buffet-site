@@ -1,11 +1,28 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { ArrowRight, Briefcase } from 'lucide-react'
-
+import { SectionImageDB } from '@/lib/types'
 
 export default function CorporativoSection() {
+  const [image, setImage] = useState<SectionImageDB | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/site-images')
+      .then((r) => r.json())
+      .then((data) => {
+        setImage(data.sections.corporativo)
+        setLoading(false)
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <section className="relative py-10 sm:py-14 lg:py-16 bg-background-warm overflow-hidden">
       {/* Background accent */}
@@ -35,7 +52,6 @@ export default function CorporativoSection() {
               Levamos toda a estrutura necessária para o seu evento ser um sucesso. Nossa equipe treinada garante pontualidade, apresentação impecável e atendimento atencioso a cada detalhe.
             </p>
 
-
             {/* CTA */}
             <motion.div
               whileHover={{ x: 5 }}
@@ -53,7 +69,7 @@ export default function CorporativoSection() {
             </motion.div>
           </motion.div>
 
-          {/* Image placeholder */}
+          {/* Image placeholder or real image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -61,14 +77,30 @@ export default function CorporativoSection() {
             transition={{ duration: 0.7 }}
             className="relative hidden lg:block"
           >
-            <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <Briefcase className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
-                  <p className="text-xs text-text-muted/40 font-medium">Evento corporativo</p>
+            {loading ? (
+              <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5] flex items-center justify-center">
+                <p className="text-text-muted">Carregando imagem...</p>
+              </div>
+            ) : image?.src && !imageError ? (
+              <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                />
+              </div>
+            ) : (
+              <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <Briefcase className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
+                    <p className="text-xs text-text-muted/40 font-medium">Evento corporativo</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </div>

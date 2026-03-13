@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   BookOpen,
   PlusCircle,
+  Images,
   Menu,
   X,
   ArrowLeft,
@@ -17,6 +18,7 @@ const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/cardapios', label: 'Cardápios', icon: BookOpen },
   { href: '/admin/extras', label: 'Extras', icon: PlusCircle },
+  { href: '/admin/imagens', label: 'Imagens', icon: Images },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

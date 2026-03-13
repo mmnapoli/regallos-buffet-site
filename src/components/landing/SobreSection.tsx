@@ -1,8 +1,27 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { SectionImageDB } from '@/lib/types'
 
 export default function SobreSection() {
+  const [image, setImage] = useState<SectionImageDB | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/site-images')
+      .then((r) => r.json())
+      .then((data) => {
+        setImage(data.sections.sobre)
+        setLoading(false)
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <section className="relative py-16 sm:py-20 lg:py-24 bg-white overflow-hidden">
       {/* Decorative background */}
@@ -57,7 +76,7 @@ export default function SobreSection() {
             </div>
           </motion.div>
 
-          {/* Image placeholder */}
+          {/* Image placeholder or real image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -65,18 +84,34 @@ export default function SobreSection() {
             transition={{ duration: 0.7 }}
             className="relative hidden lg:block"
           >
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/15 via-primary/10 to-transparent aspect-square">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">👨‍🍳</div>
-                  <p className="text-text-muted/30 font-medium">Equipe Regallos</p>
-                </div>
+            {loading ? (
+              <div className="relative overflow-hidden rounded-2xl bg-background-warm aspect-square flex items-center justify-center">
+                <p className="text-text-muted">Carregando imagem...</p>
               </div>
+            ) : image?.src && !imageError ? (
+              <div className="relative overflow-hidden rounded-2xl aspect-square">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                />
+              </div>
+            ) : (
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-accent/15 via-primary/10 to-transparent aspect-square">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">👨‍🍳</div>
+                    <p className="text-text-muted/30 font-medium">Equipe Regallos</p>
+                  </div>
+                </div>
 
-              {/* Decorative elements */}
-              <div className="absolute top-6 right-6 w-24 h-24 border border-accent/30 rounded-full" />
-              <div className="absolute bottom-6 left-6 w-32 h-32 border border-primary/20 rounded-lg rotate-45" />
-            </div>
+                {/* Decorative elements */}
+                <div className="absolute top-6 right-6 w-24 h-24 border border-accent/30 rounded-full" />
+                <div className="absolute bottom-6 left-6 w-32 h-32 border border-primary/20 rounded-lg rotate-45" />
+              </div>
+            )}
 
             {/* Accent line */}
             <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-accent/50 via-accent/30 to-transparent rounded-full" />

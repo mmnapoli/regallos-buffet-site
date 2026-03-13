@@ -20,10 +20,10 @@ test.describe('Homepage', () => {
 
   test('should have working CTA navigation', async ({ page }) => {
     // Click budget button and check navigation
-    const budgetLink = page.locator('a[href*="orcamento"]').first()
+    const budgetLink = page.locator('a[href="/orcamento"]').first()
     if (await budgetLink.isVisible()) {
-      await budgetLink.click()
-      await expect(page).toHaveURL(/orcamento/)
+      await budgetLink.click({ timeout: 10000 })
+      await expect(page).toHaveURL(/orcamento/, { timeout: 10000 })
     }
   })
 

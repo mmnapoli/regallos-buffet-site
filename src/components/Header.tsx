@@ -13,7 +13,11 @@ const navLinks = [
   { href: '/orcamento', label: 'Orçamento' },
 ]
 
-export default function Header() {
+interface HeaderProps {
+  logoSrc?: string
+}
+
+export default function Header({ logoSrc = '/logo-horizontal.svg' }: HeaderProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [hasScrolled, setHasScrolled] = useState(false)
@@ -42,14 +46,15 @@ export default function Header() {
           className="flex items-center gap-2 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg"
           aria-label="Regallos Gastronomia - Página inicial"
         >
-          <Image
-            src="/logo-horizontal.svg"
-            alt="Regallos Gastronomia"
-            width={160}
-            height={60}
-            className="h-10 sm:h-12 w-auto transition-opacity duration-200 group-hover:opacity-80"
-            priority
-          />
+          <div className="relative h-10 sm:h-12 w-40">
+            <Image
+              src={logoSrc}
+              alt="Regallos Gastronomia"
+              fill
+              className="object-contain transition-opacity duration-200 group-hover:opacity-80"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop Navigation */}

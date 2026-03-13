@@ -5,7 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  logoSrc?: string
+}
+
+export default function HeroSection({ logoSrc = '/logo-horizontal.svg' }: HeroSectionProps) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -39,14 +43,15 @@ export default function HeroSection() {
         >
           {/* Logo */}
           <motion.div variants={itemVariants} className="flex justify-center">
-            <Image
-              src="/logo-horizontal.svg"
-              alt="Regallos Gastronomia"
-              width={280}
-              height={105}
-              className="h-20 sm:h-24 lg:h-28 w-auto"
-              priority
-            />
+            <div className="relative h-20 sm:h-24 lg:h-28 w-[280px] max-w-full">
+              <Image
+                src={logoSrc}
+                alt="Regallos Gastronomia"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           </motion.div>
 
           {/* Main headline */}

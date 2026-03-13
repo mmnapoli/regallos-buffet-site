@@ -1,0 +1,56 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e5]:
+        - img [ref=e6]
+        - generic [ref=e11]:
+          - paragraph [ref=e12]: Regallos
+          - paragraph [ref=e13]: Admin
+      - navigation "Menu do admin" [ref=e14]:
+        - link "Dashboard" [ref=e15] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e16]
+          - text: Dashboard
+        - link "Cardápios" [ref=e21] [cursor=pointer]:
+          - /url: /admin/cardapios
+          - img [ref=e22]
+          - text: Cardápios
+        - link "Extras" [ref=e24] [cursor=pointer]:
+          - /url: /admin/extras
+          - img [ref=e25]
+          - text: Extras
+        - link "Imagens" [ref=e27] [cursor=pointer]:
+          - /url: /admin/imagens
+          - img [ref=e28]
+          - text: Imagens
+      - link "Voltar ao site" [ref=e34] [cursor=pointer]:
+        - /url: /
+        - img [ref=e35]
+        - text: Voltar ao site
+    - generic [ref=e37]:
+      - banner [ref=e38]:
+        - button "Abrir menu" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+        - generic [ref=e41]: Admin
+      - main [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e45]:
+            - heading "Gerenciar Imagens" [level=1] [ref=e46]
+            - paragraph [ref=e47]: Controle todas as imagens do site
+          - generic [ref=e48]:
+            - button "Galeria" [ref=e49] [cursor=pointer]
+            - button "Seções do Site" [ref=e50] [cursor=pointer]
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - heading "Adicionar Nova Imagem" [level=3] [ref=e53]
+              - generic [ref=e54]:
+                - paragraph [ref=e55]: Selecione uma imagem para a galeria
+                - generic [ref=e58] [cursor=pointer]:
+                  - paragraph [ref=e59]: 📷
+                  - paragraph [ref=e60]: Selecione uma imagem para a galeria
+            - generic [ref=e61]:
+              - heading "Imagens da Galeria (0)" [level=3] [ref=e62]
+              - paragraph [ref=e63]: Nenhuma imagem na galeria ainda
+  - button "Open Next.js Dev Tools" [ref=e69] [cursor=pointer]:
+    - img [ref=e70]
+  - alert [ref=e73]

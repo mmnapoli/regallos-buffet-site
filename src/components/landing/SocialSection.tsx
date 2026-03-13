@@ -1,11 +1,28 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { ArrowRight, Heart } from 'lucide-react'
-
+import { SectionImageDB } from '@/lib/types'
 
 export default function SocialSection() {
+  const [image, setImage] = useState<SectionImageDB | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [imageError, setImageError] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/site-images')
+      .then((r) => r.json())
+      .then((data) => {
+        setImage(data.sections.social)
+        setLoading(false)
+      })
+      .catch(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <section className="relative py-10 sm:py-14 lg:py-16 bg-background-warm overflow-hidden">
       {/* Background accent */}
@@ -15,7 +32,7 @@ export default function SocialSection() {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Image placeholder - left on desktop */}
+          {/* Image placeholder or real image - left on desktop */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -23,14 +40,30 @@ export default function SocialSection() {
             transition={{ duration: 0.7 }}
             className="relative order-2 lg:order-1 hidden lg:block"
           >
-            <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <Heart className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
-                  <p className="text-xs text-text-muted/40 font-medium">Evento social</p>
+            {loading ? (
+              <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5] flex items-center justify-center">
+                <p className="text-text-muted">Carregando imagem...</p>
+              </div>
+            ) : image?.src && !imageError ? (
+              <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover"
+                  onError={() => setImageError(true)}
+                />
+              </div>
+            ) : (
+              <div className="relative overflow-hidden rounded-xl bg-background-warm aspect-[4/5]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <Heart className="w-12 h-12 text-text-muted/20 mx-auto mb-2" />
+                    <p className="text-xs text-text-muted/40 font-medium">Evento social</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </motion.div>
 
           {/* Text content */}

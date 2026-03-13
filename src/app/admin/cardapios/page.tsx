@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Pencil, Trash2, Plus, Save, X, Users } from 'lucide-react'
 import { cardapios as initialCardapios } from '@/data/mock'
 import type { Cardapio } from '@/types'
+import ImageUploader from '@/components/admin/ImageUploader'
+import { updateCardapioImage } from '@/lib/api-client'
 
 function formatCurrency(value: number): string {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -118,17 +121,22 @@ export default function AdminCardapios() {
                 className="w-full px-3 py-2 border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
               />
             </div>
-            <div>
-              <label htmlFor="card-image" className="block text-sm font-medium text-text-main mb-1">
-                URL da Imagem
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-text-main mb-2">
+                Imagem do Cardápio
               </label>
-              <input
-                id="card-image"
-                type="text"
-                value={editing.image}
-                onChange={(e) => setEditing({ ...editing, image: e.target.value })}
-                className="w-full px-3 py-2 border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
-                placeholder="/images/nome.jpg"
+              <ImageUploader
+                currentSrc={editing.image}
+                subfolder="cardapios"
+                onUploadComplete={(url) => {
+                  setEditing({ ...editing, image: url })
+                  if (!isNew) {
+                    updateCardapioImage(editing.id, url, editing.name).catch((err) =>
+                      alert(err.message)
+                    )
+                  }
+                }}
+                label="Selecione uma imagem"
               />
             </div>
           </div>
@@ -172,6 +180,7 @@ export default function AdminCardapios() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border-light bg-background-warm">
+                <th className="text-left px-4 py-3 font-medium text-text-muted">Foto</th>
                 <th className="text-left px-4 py-3 font-medium text-text-muted">Nome</th>
                 <th className="text-left px-4 py-3 font-medium text-text-muted">Preço/pessoa</th>
                 <th className="text-left px-4 py-3 font-medium text-text-muted">Mín.</th>
@@ -181,6 +190,22 @@ export default function AdminCardapios() {
             <tbody>
               {items.map((item) => (
                 <tr key={item.id} className="border-b border-border-light last:border-0 hover:bg-background-warm transition-colors duration-200">
+                  <td className="px-4 py-3">
+                    {item.image ? (
+                      <div className="relative w-12 h-12 rounded overflow-hidden">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded bg-background-warm flex items-center justify-center text-text-muted/40">
+                        <span className="text-xs">📷</span>
+                      </div>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <p className="font-medium text-text-main">{item.name}</p>
                     <p className="text-xs text-text-muted line-clamp-1">{item.description}</p>

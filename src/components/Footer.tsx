@@ -4,7 +4,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Phone, MapPin, Instagram, Clock } from 'lucide-react'
 
-export default function Footer() {
+interface FooterProps {
+  logoSrc?: string
+}
+
+export default function Footer({ logoSrc = '/logo-horizontal.svg' }: FooterProps) {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -17,13 +21,14 @@ export default function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="inline-block cursor-pointer group focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-lg">
-              <Image
-                src="/logo-horizontal.svg"
-                alt="Regallos Gastronomia"
-                width={160}
-                height={60}
-                className="h-10 w-auto brightness-0 invert transition-opacity duration-200 group-hover:opacity-80"
-              />
+              <div className="relative h-10 w-40">
+                <Image
+                  src={logoSrc}
+                  alt="Regallos Gastronomia"
+                  fill
+                  className="object-contain brightness-0 invert transition-opacity duration-200 group-hover:opacity-80"
+                />
+              </div>
             </Link>
             <p className="text-sm text-white/70 leading-relaxed max-w-xs">
               Há 14 anos transformando eventos em experiências gastronômicas inesquecíveis. Qualidade, cuidado e sabor em cada detalhe.
