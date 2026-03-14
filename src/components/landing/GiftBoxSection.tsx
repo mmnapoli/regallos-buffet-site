@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Image } from 'lucide-react'
 
 const giftBoxes = [
   {
@@ -22,14 +22,14 @@ const giftBoxes = [
 export default function GiftBoxSection() {
   const containerRef = useRef(null)
 
-  // Parallax suave para os cards
+  // Parallax suave para os cards (ambos sobem no scroll)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
-  const card1Y = useTransform(scrollYProgress, [0, 1], [40, -20])
-  const card2Y = useTransform(scrollYProgress, [0, 1], [-40, 20])
+  const card1Y = useTransform(scrollYProgress, [0, 1], [30, -15])
+  const card2Y = useTransform(scrollYProgress, [0, 1], [45, -20])
 
   // Variants para o título (reveal com delay)
   const titleVariants = {
@@ -98,67 +98,109 @@ export default function GiftBoxSection() {
 
         {/* Cards Layout - Staggered Editorial Style */}
         <div className="relative space-y-16 sm:space-y-20 lg:space-y-24">
-          {/* Card 1 - Left Aligned */}
+          {/* Card 1 - Left Aligned with Image */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={cardVariants(0.1)}
             style={{ y: card1Y }}
-            className="w-full lg:w-1/2 group cursor-pointer"
+            className="w-full flex flex-col lg:flex-row gap-8 lg:gap-12 items-start lg:items-center"
           >
-            <div className="relative bg-white border-l-4 border-l-primary/0 group-hover:border-l-primary pl-0 group-hover:pl-6 transition-all duration-500 overflow-hidden">
-              {/* Top accent line - appear on hover */}
-              <div className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary via-primary to-transparent origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+            {/* Text Content */}
+            <div className="flex-1 group cursor-pointer">
+              <div className="relative bg-white border-l-4 border-l-primary/0 group-hover:border-l-primary pl-0 group-hover:pl-6 transition-all duration-500 overflow-hidden">
+                {/* Top accent line - appear on hover */}
+                <div className="absolute top-0 left-0 h-1 bg-gradient-to-r from-primary via-primary to-transparent origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
 
-              {/* Content */}
-              <div className="pt-4 sm:pt-6 lg:pt-8 pb-6 sm:pb-8">
-                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight mb-6 group-hover:text-primary transition-colors duration-500">
-                  {giftBoxes[0].title.split('\n').map((line, i) => (
-                    <span key={i} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h3>
-                <p className="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl mb-8 group-hover:text-text-main/80 transition-colors duration-500">
-                  {giftBoxes[0].description}
-                </p>
-                <div className="inline-flex items-center gap-2 text-primary font-semibold opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-2 transition-all duration-500">
-                  <span>Conheça mais</span>
-                  <ArrowRight className="w-4 h-4" />
+                {/* Content */}
+                <div className="pt-4 sm:pt-6 lg:pt-8 pb-6 sm:pb-8">
+                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight mb-6 group-hover:text-primary transition-colors duration-500">
+                    {giftBoxes[0].title.split('\n').map((line, i) => (
+                      <span key={i} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </h3>
+                  <p className="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl mb-8 group-hover:text-text-main/80 transition-colors duration-500">
+                    {giftBoxes[0].description}
+                  </p>
+                  <div className="inline-flex items-center gap-2 text-primary font-semibold opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-2 transition-all duration-500">
+                    <span>Conheça mais</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Image Placeholder */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full sm:w-64 lg:w-72 flex-shrink-0"
+            >
+              <div className="aspect-[4/3] rounded-xl bg-background-warm border border-border-light/50 flex items-center justify-center overflow-hidden">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 mx-auto mb-3 flex items-center justify-center">
+                    <Image className="w-6 h-6 text-primary/40" />
+                  </div>
+                  <span className="text-xs text-text-muted/60">Imagem</span>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
 
-          {/* Card 2 - Right Aligned with offset */}
+          {/* Card 2 - Right Aligned with Image (espelhado) */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={cardVariants(0.3)}
             style={{ y: card2Y }}
-            className="w-full lg:w-1/2 lg:ml-auto group cursor-pointer"
+            className="w-full flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-start lg:items-center lg:ml-auto"
           >
-            <div className="relative bg-white border-r-4 border-r-primary/0 group-hover:border-r-primary pr-0 group-hover:pr-6 transition-all duration-500 overflow-hidden">
-              {/* Top accent line - appear on hover */}
-              <div className="absolute top-0 right-0 h-1 bg-gradient-to-l from-primary via-primary to-transparent origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+            {/* Image Placeholder (lado esquerdo no desktop) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full sm:w-64 lg:w-72 flex-shrink-0"
+            >
+              <div className="aspect-[4/3] rounded-xl bg-background-warm border border-border-light/50 flex items-center justify-center overflow-hidden">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 mx-auto mb-3 flex items-center justify-center">
+                    <Image className="w-6 h-6 text-primary/40" />
+                  </div>
+                  <span className="text-xs text-text-muted/60">Imagem</span>
+                </div>
+              </div>
+            </motion.div>
 
-              {/* Content */}
-              <div className="pt-4 sm:pt-6 lg:pt-8 pb-6 sm:pb-8">
-                <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight mb-6 group-hover:text-primary transition-colors duration-500">
-                  {giftBoxes[1].title.split('\n').map((line, i) => (
-                    <span key={i} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h3>
-                <p className="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl mb-8 group-hover:text-text-main/80 transition-colors duration-500">
-                  {giftBoxes[1].description}
-                </p>
-                <div className="inline-flex items-center gap-2 text-primary font-semibold opacity-0 group-hover:opacity-100 translate-x-0 group-hover:-translate-x-2 transition-all duration-500">
-                  <ArrowRight className="w-4 h-4" />
-                  <span>Conheça mais</span>
+            {/* Text Content */}
+            <div className="flex-1 group cursor-pointer">
+              <div className="relative bg-white border-r-4 border-r-primary/0 group-hover:border-r-primary pr-0 group-hover:pr-6 transition-all duration-500 overflow-hidden">
+                {/* Top accent line - appear on hover */}
+                <div className="absolute top-0 right-0 h-1 bg-gradient-to-l from-primary via-primary to-transparent origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+
+                {/* Content */}
+                <div className="pt-4 sm:pt-6 lg:pt-8 pb-6 sm:pb-8">
+                  <h3 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main leading-tight mb-6 group-hover:text-primary transition-colors duration-500">
+                    {giftBoxes[1].title.split('\n').map((line, i) => (
+                      <span key={i} className="block">
+                        {line}
+                      </span>
+                    ))}
+                  </h3>
+                  <p className="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl mb-8 group-hover:text-text-main/80 transition-colors duration-500">
+                    {giftBoxes[1].description}
+                  </p>
+                  <div className="inline-flex items-center gap-2 text-primary font-semibold opacity-0 group-hover:opacity-100 translate-x-0 group-hover:translate-x-2 transition-all duration-500">
+                    <span>Conheça mais</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
             </div>
